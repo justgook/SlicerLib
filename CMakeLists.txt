@@ -18,6 +18,7 @@ add_definitions(-DSCRIPT_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}/test/lua")
 
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/vendor")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 
 
