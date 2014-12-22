@@ -67,6 +67,7 @@ int main() {
 
 
     /* Call Slicer and to result */
+//    http://www.geeks3d.com/glslhacker/reference/scripting_mesh.php
     slicer = new Slicer(L, contents);
 
     /* Call Filler and to result */

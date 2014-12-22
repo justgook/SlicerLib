@@ -4,6 +4,10 @@
 class Slicer {
 public:
     Slicer(lua_State *L, std::string stlFileContents) {
+      // !! READ !!
+      // http://www.geeks3d.com/glslhacker/reference/scripting_mesh.php
+
+
 //    http://stackoverflow.com/questions/16863540/parse-svg-path-definition-d-in-lua
         layers = {"M 20 30 L 20 20 20 40 40 40"};
 
