@@ -2,12 +2,14 @@
 #define __Slicer_H_
 
 #include <lua.hpp>
+#include "Exception.hpp"
 
 class Slicer {
 public:
     Slicer(lua_State *L, const char *filename) {
         if (luaL_dofile(L, filename)) {
-            printf("error 102 - %s\n", lua_tostring(L, -1));
+            throw(Exception(102, lua_tostring(L, -1)));
+//            printf("error 102 - %s\n", lua_tostring(L, -1));
         }
         // !! READ !!
         // http://www.geeks3d.com/glslhacker/reference/scripting_mesh.php
@@ -27,7 +29,11 @@ public:
         return "Description place holder";
     }
 
-    bool validateLuaFile(){
+    std::string getVersion() {
+        return "Version place holder";
+    }
+
+    bool validateLuaFile() {
         return true;
     }
 

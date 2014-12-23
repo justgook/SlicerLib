@@ -4,6 +4,7 @@
 
 #include <lua.hpp>
 #include <tclap/CmdLine.h>
+#include <Exception.hpp>
 
 //using namespace std;
 
@@ -13,7 +14,7 @@
 /* the Lua interpreter */
 lua_State *L;
 
-#define concat(first, second) first second
+//#define concat(first, second) first second
 
 //http://luapower.com/
 
@@ -69,12 +70,15 @@ int main(int argc, const char *const *argv) {
         slicer = new Slicer(L, slicerFileLua.getValue().c_str());
         slicer->exec(sltContents);
 
-
-    } catch (TCLAP::ArgException &e)  // catch any exceptions
+        //http://stackoverflow.com/questions/2512931/catch-multiple-custom-exceptions-c
+    }
+    catch (TCLAP::ArgException &e)  // catch any exceptions
     {
         std::cerr << "error: " << e.error() << " " << e.argId() << " " << std::endl;
     }
-
+    catch ( const Exception& e ) {
+        std::cerr << "SlicerLib Exeptions ( " << e.code() << " - " << e.error() << ")" << std::endl;
+    }
     lua_close(L);
 
     return 0;
