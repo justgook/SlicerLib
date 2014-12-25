@@ -2,7 +2,6 @@
 #include <iomanip>
 
 
-#include <lua.hpp>
 #include <tclap/CmdLine.h>
 #include <Exception.hpp>
 
@@ -12,7 +11,6 @@
 
 //http://gamedevgeek.com/tutorials/calling-lua-functions/
 /* the Lua interpreter */
-lua_State *L;
 
 //#define concat(first, second) first second
 
@@ -56,30 +54,51 @@ int main(int argc, const char *const *argv) {
         std::cout << "STL: " << stlFileName.getValue() << std::endl;
         std::cout << "Slicer: " << slicerFileLua.getValue() << std::endl;
 
+
         std::ifstream inputStlFile(stlFileName.getValue());
         if (!inputStlFile.good()) {
-            throw(TCLAP::ArgException("101 - STL file not found"));
+            throw(Exception(101, "STL file not found"));
+        }
+
+        std::string sltContents((std::istreambuf_iterator<char>(inputStlFile)), std::istreambuf_iterator<char>());
+        slicer = new Slicer(slicerFileLua.getValue().c_str());
+        std::vector<std::string> path = slicer->exec(sltContents.c_str());
+
+        // Getting all data and push to files
+        if (middleFiles.getValue()) {
+            std::cout << "================================================================================" << std::endl;
+            int index = 0;
+            for (std::vector<std::string>::const_iterator i = path.begin(); i != path.end(); ++i) {
+                std::ofstream myfile;
+                std::string filename = "example";
+                filename += std::to_string(index);
+                filename += ".svg";
+                myfile.open(filename);
+                myfile << "<?xml version=\"1.0\" standalone=\"no\"?>" << std::endl
+                        << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << std::endl
+                        << "<svg width=\"4cm\" height=\"4cm\" viewBox=\"0 0 400 400\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" << std::endl
+                        << "<title>Example triangle01- simple example of a path</title>" << std::endl
+                        << "<desc>A path that draws a triangle</desc>" << std::endl
+                        << "<rect x=\"1\" y=\"1\" width=\"398\" height=\"398\" fill=\"none\" stroke=\"blue\" />" << std::endl
+                        << "<path d=\"" << *i << "\" fill=\"red\" stroke=\"blue\" stroke-width=\"3\" />" << std::endl
+                        << "</svg>" << std::endl;
+                myfile.close();
+                index++;
+            }
+            std::cout << "================================================================================" << std::endl;
         }
 
 
-        L = luaL_newstate();
-        luaL_openlibs(L);
-
-
-        std::string sltContents((std::istreambuf_iterator<char>(inputStlFile)), std::istreambuf_iterator<char>());
-        slicer = new Slicer(L, slicerFileLua.getValue().c_str());
-        slicer->exec(sltContents);
-
-        //http://stackoverflow.com/questions/2512931/catch-multiple-custom-exceptions-c
     }
     catch (TCLAP::ArgException &e)  // catch any exceptions
     {
         std::cerr << "error: " << e.error() << " " << e.argId() << " " << std::endl;
+
     }
-    catch ( const Exception& e ) {
+    catch (const Exception &e) {
         std::cerr << "SlicerLib Exeptions ( " << e.code() << " - " << e.error() << ")" << std::endl;
+
     }
-    lua_close(L);
 
     return 0;
 }
